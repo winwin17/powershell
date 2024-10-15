@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myapp17">
+<head>
+    <meta charset="UTF-8">
+    <title>Leaving Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+    angular.module('myapp17', [])
+    
+    // Factory for shared data (if needed)
+    .factory('FormDataFactory', function() {
+        let data = {};
+        return {
+            setData: function(newData) {
+                data = newData;
+            },
+            getData: function() {
+                return data;
+            }
+        };
+    })
+
+    // Service for handling HTTP requests
+    .service('FormService', function($http) {
+        this.submitForm = function(formData) {
+            return $http.post('/submitform', formData);
+        };
+    })
+
+    // Custom directive for form validation (optional)
+    .directive('validateForm', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, element) {
+                element.on('submit', function() {
+                    if (!scope.formdata.Name || !scope.formdata.Room || !scope.formdata.Address) {
+                        alert("All fields are required!");
+                        return false; // Prevent form submission if validation fails
+                    }
+                });
+            }
+        };
+    })
+
+    // Main Controller
+   .controller('FormController', function($scope, FormService, FormDataFactory) {
+    $scope.formdata = {};
+    
+    // Submit form function
+    $scope.submitForm = function() {
+        // Assign the current timestamp to the formdata object
+        $scope.formdata.timestamp = new Date();
+
+        FormService.submitForm($scope.formdata)
+        .then(function(response) {
+            alert('Form submitted successfully');
+            $scope.formdata = {}; // Clear the form after successful submission
+        })
+        .catch(function(error) {
+            console.error('Error submitting form:', error);
+            alert('Error: ' + error.message);
+        });
+    };
+});
+    </script>
+</head>
+<body ng-controller="FormController">
+    <main>
+        <form ng-submit="submitForm()" validate-form novalidate>
+            <h2>Leaving Form</h2>
+
+            <!-- Using built-in filters like uppercase -->
+            <label for="Name">NAME</label>
+            <input type="text" id="Name" name="Name" ng-model="formdata.Name" required>
+            
+            <label for="Room">ROOM</label>
+            <input type="text" id="Room" name="Room" ng-model="formdata.Room" required>
+
+            <label for="Address">ADDRESS</label>
+            <input type="text" id="Address" name="Address" ng-model="formdata.Address" required>
+
+            <!-- Add a submission timestamp, formatted with Angular's built-in date filter -->
+            <p><strong>Submitted on:</strong> {{ formdata.timestamp | date: 'fullDate' }}</p>
+
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+</body>
+</html>
+
+
