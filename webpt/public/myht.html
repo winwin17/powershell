@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myapp17">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+    angular.module('myapp17', [])
+    .controller('formcontroller', function($scope, $http) {
+        $scope.formdata = {};
+
+        // Function to submit the form
+        $scope.submitform = function() {
+            $http.post('/submitform', $scope.formdata)
+            .then(function(response) {
+                alert('Form submitted successfully');
+                $scope.formdata = {}; // Clear form
+            })
+            .catch(function(error) {
+                console.error('Error submitting form:', error);
+                alert('Error: ' + error.message);
+            });
+        };
+    });
+    </script>
+</head>
+<body ng-controller="formcontroller">
+    <main>
+        <form ng-submit="submitform()" novalidate>
+            <h2>Leaving Form</h2>
+            <label for="Name">NAME</label>
+            <input type="text" id="Name" name="Name" ng-model="formdata.Name" required>
+            
+            <label for="Room">ROOM</label>
+            <input type="text" id="Room" name="Room" ng-model="formdata.Room" required>
+
+            <label for="Address">ADDRESS</label>
+            <input type="text" id="Address" name="Address" ng-model="formdata.Address" required>
+
+            <button type="submit" value="submit">Submit</button>
+        </form>
+    </main>
+</body>
+</html>
